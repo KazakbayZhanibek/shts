@@ -1,0 +1,14 @@
+# Зависимости и ОС
+node_modules/
+Thumbs.db
+.DS_Store
+desktop.ini
+
+# Редакторы
+.vscode/
+.idea/
+*.code-workspace
+
+# Временные файлы
+*.tmp
+*.log

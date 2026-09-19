@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Тенге Трекер — личный финансовый трекер</title>
+<meta name="description" content="Личный финансовый трекер: доходы, расходы, накопления, цели и депозит.">
+<link rel="stylesheet" href="css/styles.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+<!-- SVG-спрайт иконок (единый стиль, stroke = currentColor) -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-home" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M9 21v-6h6v6"/></symbol>
+    <symbol id="i-history" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12v18l-2-1.6-2 1.6-2-1.6L10 21l-2-1.6L6 21z"/><path d="M9 8h6"/><path d="M9 12h6"/></symbol>
+    <symbol id="i-chart" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4v16h16"/><path d="M9 16v-5"/><path d="M13 16V8"/><path d="M17 16v-3"/></symbol>
+    <symbol id="i-target" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.2" fill="currentColor" stroke="none"/></symbol>
+    <symbol id="i-bus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3.5" width="16" height="13" rx="2.5"/><path d="M4 10h16"/><path d="M12 3.5V10"/><circle cx="8" cy="18.5" r="1.8"/><circle cx="16" cy="18.5" r="1.8"/></symbol>
+    <symbol id="i-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13.2A8 8 0 0 1 10.8 4 8 8 0 1 0 20 13.2z"/></symbol>
+    <symbol id="i-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2.5M12 19.5V22M4.6 4.6l1.8 1.8M17.6 17.6l1.8 1.8M2 12h2.5M19.5 12H22M4.6 19.4l1.8-1.8M17.6 6.4l1.8-1.8"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></symbol>
+    <symbol id="i-edit" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l1-4.5L16.5 4a2.12 2.12 0 0 1 3 3L8 18.5z"/><path d="M14.5 6l3 3"/></symbol>
+    <symbol id="i-trend-up" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/></symbol>
+    <symbol id="i-trend-down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7l6 6 4-4 8 8"/><path d="M15 17h6v-6"/></symbol>
+    <symbol id="i-coins" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5.5" rx="7" ry="2.8"/><path d="M5 5.5v6c0 1.5 3.1 2.8 7 2.8s7-1.3 7-2.8v-6"/><path d="M5 11.5v6c0 1.5 3.1 2.8 7 2.8s7-1.3 7-2.8v-6"/></symbol>
+    <symbol id="i-bank" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5 12 4l9 5.5"/><path d="M5 10v8M9.5 10v8M14.5 10v8M19 10v8"/><path d="M3 20.5h18"/></symbol>
+    <symbol id="i-trophy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 4h8v4.5a4 4 0 0 1-8 0z"/><path d="M8 5H4.5A3.5 3.5 0 0 0 8 12M16 5h3.5A3.5 3.5 0 0 1 16 12"/><path d="M12 12.5V16M8.5 20.5h7M9.5 16h5"/></symbol>
+    <symbol id="i-wallet" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="13" rx="2.5"/><path d="M3 10.5h18"/><path d="M16.5 15h.01"/></symbol>
+  </defs>
+</svg>
+<header class="topbar">
+  <div class="topbar-inner">
+    <div class="logo"><span class="logo-mark">₸</span><span class="logo-text">Трекер</span></div>
+    <div class="topbar-right">
+      <span id="syncStatus" class="sync sync-local" title="Статус синхронизации">● локально</span>
+      <button id="themeToggle" class="icon-btn" aria-label="Переключить тему"><svg class="ic" aria-hidden="true"><use id="themeUse" href="#i-moon"/></svg></button>
+    </div>
+  </div>
+</header>
+
+<main class="container">
+  <!-- ============ HOME ============ -->
+  <section id="page-home" class="page active">
+    <div class="hero">
+      <div class="hero-label">Доступно сейчас</div>
+      <div id="heroAvailable" class="hero-amount">0 ₸</div>
+      <div class="hero-sub">
+        <div><span>Всего капитал</span><strong id="heroTotal">0 ₸</strong></div>
+        <div><span>В накоплениях</span><strong id="heroSaved">0 ₸</strong></div>
+      </div>
+    </div>
+
+    <div class="quick-row">
+      <button id="btnAddMain" class="btn btn-primary btn-big"><svg class="ic" aria-hidden="true"><use href="#i-plus"/></svg> Добавить запись</button>
+      <button id="btnTrip" class="btn btn-ghost" title="Одна поездка — 120 ₸"><svg class="ic ic-lg" aria-hidden="true"><use href="#i-bus"/></svg><span>+ поездка<br><small>120 ₸</small></span></button>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Сегодня <span id="todayDate" class="muted"></span></div>
+      <div class="stat-grid-3">
+        <div class="stat"><span>Заработано</span><strong id="todayEarned" class="green">0 ₸</strong></div>
+        <div class="stat"><span>Потрачено</span><strong id="todaySpent" class="red">0 ₸</strong></div>
+        <div class="stat"><span>Чистыми</span><strong id="todayNet">0 ₸</strong></div>
+      </div>
+      <div class="stat-grid-3 mt">
+        <div class="stat"><span>Отложено сегодня</span><strong id="todaySaved">0 ₸</strong></div>
+        <div class="stat"><span>Поездки сегодня</span><strong id="todayTrips">0</strong></div>
+        <div class="stat"><span>Операций</span><strong id="todayCount">0</strong></div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">Эта неделя</div>
+        <div class="kv"><span>Доход</span><strong id="weekEarned" class="green">0 ₸</strong></div>
+        <div class="kv"><span>Расход</span><strong id="weekSpent" class="red">0 ₸</strong></div>
+        <div class="kv"><span>Чистыми</span><strong id="weekNet">0 ₸</strong></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Этот месяц</div>
+        <div class="kv"><span>Доход</span><strong id="monthEarned" class="green">0 ₸</strong></div>
+        <div class="kv"><span>Расход</span><strong id="monthSpent" class="red">0 ₸</strong></div>
+        <div class="kv"><span>Накоплено</span><strong id="monthSaved">0 ₸</strong></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Свободный остаток месяца</div>
+      <div id="monthFree" class="big-number">0 ₸</div>
+      <div class="muted small" id="monthSaveRate">Доля накоплений: 0%</div>
+      <div class="progress"><div id="monthSaveBar" class="progress-fill" style="width:0%"></div></div>
+    </div>
+
+    <div class="section-head">
+      <h2>Последние операции</h2>
+      <button class="link" data-goto="history">Все →</button>
+    </div>
+    <div id="recentList" class="tx-list"></div>
+
+    <div class="section-head">
+      <h2>Цели</h2>
+      <button class="link" data-goto="goals">Все →</button>
+    </div>
+    <div id="homeGoals"></div>
+  </section>
+
+  <!-- ============ HISTORY ============ -->
+  <section id="page-history" class="page">
+    <h1 class="page-title">История</h1>
+    <div class="card filters">
+      <div class="chip-row" id="periodChips">
+        <button class="chip active" data-period="today">Сегодня</button>
+        <button class="chip" data-period="week">Неделя</button>
+        <button class="chip" data-period="month">Месяц</button>
+        <button class="chip" data-period="all">Все</button>
+        <button class="chip" data-period="custom">Период…</button>
+      </div>
+      <div id="customPeriod" class="custom-period hidden">
+        <input type="date" id="filterFrom"><span>—</span><input type="date" id="filterTo">
+      </div>
+      <div class="chip-row" id="typeChips">
+        <button class="chip active" data-type="all">Все</button>
+        <button class="chip" data-type="income">Доходы</button>
+        <button class="chip" data-type="expense">Расходы</button>
+        <button class="chip" data-type="saving">Накопления</button>
+      </div>
+      <select id="filterCategory" class="input">
+        <option value="all">Все категории</option>
+      </select>
+    </div>
+    <div id="historySummary" class="card hidden"></div>
+    <div id="historyList"></div>
+  </section>
+
+  <!-- ============ ANALYTICS ============ -->
+  <section id="page-analytics" class="page">
+    <h1 class="page-title">Аналитика</h1>
+    <div class="chip-row" id="analyticsPeriod">
+      <button class="chip active" data-aperiod="30">30 дней</button>
+      <button class="chip" data-aperiod="14">14 дней</button>
+      <button class="chip" data-aperiod="month">Этот месяц</button>
+      <button class="chip" data-aperiod="all">Всё время</button>
+    </div>
+    <div id="analyticsSummary" class="grid-2"></div>
+    <div class="card">
+      <div class="card-title">Доходы и расходы по дням</div>
+      <div id="chartDaily" class="bars"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Доходы по неделям</div>
+      <div id="chartWeekly" class="bars"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Расходы по категориям</div>
+      <div id="chartCats"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Ключевые метрики</div>
+      <div id="metricsList"></div>
+    </div>
+  </section>
+
+  <!-- ============ GOALS + DEPOSITS ============ -->
+  <section id="page-goals" class="page">
+    <h1 class="page-title">Цели и депозит</h1>
+    <div class="tabs">
+      <button class="tab active" data-tab="goals"><svg class="ic ic-sm" aria-hidden="true"><use href="#i-target"/></svg> Цели</button>
+      <button class="tab" data-tab="deposits"><svg class="ic ic-sm" aria-hidden="true"><use href="#i-bank"/></svg> Депозит</button>
+    </div>
+    <div id="tab-goals">
+      <button id="btnAddGoal" class="btn btn-primary btn-block"><svg class="ic ic-sm" aria-hidden="true"><use href="#i-plus"/></svg> Новая цель</button>
+      <div id="goalsList" class="mt"></div>
+      <div class="card million">
+        <div class="card-title"><svg class="ic ic-sm" aria-hidden="true"><use href="#i-trophy"/></svg> Путь к первому миллиону</div>
+        <div id="millionText" class="big-number">0 / 1 000 000 ₸</div>
+        <div class="progress big"><div id="millionBar" class="progress-fill gold" style="width:0%"></div></div>
+        <div id="millionSub" class="muted small"></div>
+      </div>
+    </div>
+    <div id="tab-deposits" class="hidden">
+      <button id="btnAddDeposit" class="btn btn-primary btn-block"><svg class="ic ic-sm" aria-hidden="true"><use href="#i-plus"/></svg> Новый депозит</button>
+      <div id="depositsList" class="mt"></div>
+    </div>
+  </section>
+</main>
+
+<!-- Bottom nav -->
+<nav class="bottomnav">
+  <button class="nav-item active" data-goto="home"><svg class="ic ic-nav" aria-hidden="true"><use href="#i-home"/></svg><small>Главная</small></button>
+  <button class="nav-item" data-goto="history"><svg class="ic ic-nav" aria-hidden="true"><use href="#i-history"/></svg><small>История</small></button>
+  <button id="navAdd" class="nav-add" aria-label="Добавить запись"><svg class="ic ic-add" aria-hidden="true"><use href="#i-plus"/></svg></button>
+  <button class="nav-item" data-goto="analytics"><svg class="ic ic-nav" aria-hidden="true"><use href="#i-chart"/></svg><small>Аналитика</small></button>
+  <button class="nav-item" data-goto="goals"><svg class="ic ic-nav" aria-hidden="true"><use href="#i-target"/></svg><small>Цели</small></button>
+</nav>
+
+<!-- Modal: transaction -->
+<div id="modalTx" class="modal hidden">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-head"><h2 id="txModalTitle">Новая запись</h2><button class="icon-btn" data-close="modalTx"><svg class="ic ic-sm" aria-hidden="true"><use href="#i-x"/></svg></button></div>
+    <div class="type-switch">
+      <button class="type-btn active" data-ttype="income"><svg class="ic ic-sm" aria-hidden="true"><use href="#i-trend-up"/></svg> Доход</button>
+      <button class="type-btn" data-ttype="expense"><svg class="ic ic-sm" aria-hidden="true"><use href="#i-trend-down"/></svg> Расход</button>
+      <button class="type-btn" data-ttype="saving"><svg class="ic ic-sm" aria-hidden="true"><use href="#i-coins"/></svg> Накопление</button>
+    </div>
+    <form id="txForm">
+      <input type="hidden" id="txId">
+      <label>Дата<input type="date" id="txDate" class="input" required></label>
+      <label>Сумма (₸)<input type="number" id="txAmount" class="input big-input" min="1" step="1" placeholder="15000" required></label>
+      <div id="tripHint" class="hint hidden"><svg class="ic ic-sm" aria-hidden="true"><use href="#i-bus"/></svg> Транспорт: 120 ₸ = 1 поездка. Для 3 поездок введите 360.</div>
+      <label id="txCatLabel">Категория / источник
+        <input type="text" id="txCategory" class="input" list="catList" placeholder="Работа">
+        <datalist id="catList"></datalist>
+      </label>
+      <div id="quickCats" class="chip-row"></div>
+      <label>Комментарий<input type="text" id="txDesc" class="input" placeholder="Необязательно"></label>
+      <button type="submit" class="btn btn-primary btn-block btn-big">Сохранить</button>
+      <button type="button" id="txDelete" class="btn btn-danger btn-block hidden">Удалить запись</button>
+    </form>
+  </div>
+</div>
+
+<!-- Modal: goal -->
+<div id="modalGoal" class="modal hidden">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-head"><h2 id="goalModalTitle">Новая цель</h2><button class="icon-btn" data-close="modalGoal"><svg class="ic ic-sm" aria-hidden="true"><use href="#i-x"/></svg></button></div>
+    <form id="goalForm">
+      <input type="hidden" id="goalId">
+      <label>Название<input type="text" id="goalName" class="input" placeholder="Оплата университета" required></label>
+      <label>Целевая сумма (₸)<input type="number" id="goalTarget" class="input" min="1" step="1" placeholder="114000" required></label>
+      <label>Уже собрано (₸)<input type="number" id="goalCurrent" class="input" min="0" step="1" value="0"></label>
+      <label>Дата дедлайна<input type="date" id="goalDeadline" class="input"></label>
+      <button type="submit" class="btn btn-primary btn-block">Сохранить цель</button>
+      <button type="button" id="goalDelete" class="btn btn-danger btn-block hidden">Удалить цель</button>
+    </form>
+  </div>
+</div>
+
+<!-- Modal: deposit -->
+<div id="modalDeposit" class="modal hidden">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-head"><h2 id="depModalTitle">Депозит</h2><button class="icon-btn" data-close="modalDeposit"><svg class="ic ic-sm" aria-hidden="true"><use href="#i-x"/></svg></button></div>
+    <form id="depForm">
+      <input type="hidden" id="depId">
+      <label>Название<input type="text" id="depName" class="input" placeholder="Депозит в банке" required></label>
+      <label>Текущая сумма (₸)<input type="number" id="depBalance" class="input" min="0" step="1" required></label>
+      <label>Годовая ставка (%)<input type="number" id="depRate" class="input" min="0" max="100" step="0.1" placeholder="14" required></label>
+      <label>Дата открытия<input type="date" id="depStart" class="input"></label>
+      <label>Срок (месяцев)<input type="number" id="depTerm" class="input" min="1" step="1" placeholder="12"></label>
+      <button type="submit" class="btn btn-primary btn-block">Сохранить</button>
+      <div class="grid-2 mt">
+        <button type="button" id="depTopup" class="btn btn-ghost hidden"><svg class="ic ic-sm" aria-hidden="true"><use href="#i-plus"/></svg> Пополнить</button>
+        <button type="button" id="depDelete" class="btn btn-danger hidden">Удалить</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div id="toast" class="toast hidden"></div>
+
+<script src="js/config.js"></script>
+<script src="js/finance.js"></script>
+<script src="js/store.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
