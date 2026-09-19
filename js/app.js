@@ -70,8 +70,13 @@
       setThemeIcon(next);
     };
 
-    await Store.init();
-    UI.refreshAll();
+    UI.refreshAll(); // мгновенный первый рендер из локального кэша, не ждём сеть
+    const syncEl = $("syncStatus");
+    if (CONFIG.GOOGLE_SCRIPT_URL && syncEl) {
+      syncEl.textContent = "● синхронизация…";
+      syncEl.className = "sync";
+    }
+    Store.init().then(() => UI.refreshAll()); // сверка с таблицей фоном
 
     // навигация
     document.querySelectorAll("[data-goto]").forEach((b) => (b.onclick = () => goto(b.dataset.goto)));

@@ -37,8 +37,11 @@ const Store = (() => {
   async function init() {
     loadLocal();
     if (CONFIG.GOOGLE_SCRIPT_URL) {
+      // Таймаут: висящий запрос не должен тормозить приложение
+      const ctrl = typeof AbortController !== "undefined" ? new AbortController() : null;
+      const timer = ctrl ? setTimeout(() => ctrl.abort(), 10000) : null;
       try {
-        const res = await fetch(CONFIG.GOOGLE_SCRIPT_URL + "?action=list");
+        const res = await fetch(CONFIG.GOOGLE_SCRIPT_URL + "?action=list", ctrl ? { signal: ctrl.signal } : undefined);
         const data = await res.json();
         if (data && Array.isArray(data.transactions)) {
           const rt = mergeById(state.transactions, data.transactions.map(normalizeTx));
@@ -55,6 +58,8 @@ const Store = (() => {
       } catch (e) {
         console.warn("Sheets sync failed, offline mode:", e);
         online = false;
+      } finally {
+        if (timer) clearTimeout(timer);
       }
     }
     return { state, online };
