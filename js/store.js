@@ -9,6 +9,22 @@ const Store = (() => {
 
   let state = { transactions: [], goals: [], deposits: [] };
   let online = false;
+  // Кодовое слово для таблицы (проверяется скриптом, в репозиторий НЕ попадает).
+  // Хранится только в браузере пользователя.
+  const TOKEN_KEY = "tt_api_token";
+  let apiToken = "";
+  try { apiToken = localStorage.getItem(TOKEN_KEY) || ""; } catch { /* ignore */ }
+  // ok | forbidden | unconfigured | offline | local
+  let authState = "local";
+  const getAuthState = () => authState;
+  function setToken(t) {
+    apiToken = String(t || "").trim();
+    try {
+      if (apiToken) localStorage.setItem(TOKEN_KEY, apiToken);
+      else localStorage.removeItem(TOKEN_KEY);
+    } catch { /* ignore */ }
+  }
+  const hasToken = () => apiToken.length > 0;
 
   function loadLocal() {
     try {
@@ -36,14 +52,18 @@ const Store = (() => {
 
   async function init() {
     loadLocal();
-    if (CONFIG.GOOGLE_SCRIPT_URL) {
-      // Таймаут: висящий запрос не должен тормозить приложение
-      const ctrl = typeof AbortController !== "undefined" ? new AbortController() : null;
-      const timer = ctrl ? setTimeout(() => ctrl.abort(), 10000) : null;
-      try {
-        const res = await fetch(CONFIG.GOOGLE_SCRIPT_URL + "?action=list", ctrl ? { signal: ctrl.signal } : undefined);
-        const data = await res.json();
-        if (data && Array.isArray(data.transactions)) {
+    if (!CONFIG.GOOGLE_SCRIPT_URL) { authState = "local"; return { state, online, auth: authState }; }
+    // Таймаут: висящий запрос не должен тормозить приложение
+    const ctrl = typeof AbortController !== "undefined" ? new AbortController() : null;
+    const timer = ctrl ? setTimeout(() => ctrl.abort(), 10000) : null;
+    try {
+      const res = await fetch(CONFIG.GOOGLE_SCRIPT_URL + "?action=list&token=" + encodeURIComponent(apiToken), ctrl ? { signal: ctrl.signal } : undefined);
+      const data = await res.json();
+      if (data && (data.error === "forbidden" || data.error === "token_not_configured")) {
+        // Локальные данные НЕ трогаем — просто работаем офлайн до ввода кода
+        authState = data.error === "forbidden" ? "forbidden" : "unconfigured";
+        online = false;
+      } else if (data && Array.isArray(data.transactions)) {
           const rt = mergeById(state.transactions, data.transactions.map(normalizeTx));
           const rg = mergeById(state.goals, (data.goals || []).map(normalizeGoal));
           const rd = mergeById(state.deposits, (data.deposits || []).map(normalizeDep));
@@ -53,16 +73,19 @@ const Store = (() => {
           rt.missing.forEach((t) => push("upsert", "Transactions", toTxRow(t)));
           rg.missing.forEach((g) => push("upsert", "Goals", toGoalRow(g)));
           rd.missing.forEach((d) => push("upsert", "Deposits", toDepRow(d)));
+          authState = "ok";
+        } else {
+          authState = "offline";
         }
-        online = true;
+        online = authState === "ok";
       } catch (e) {
         console.warn("Sheets sync failed, offline mode:", e);
         online = false;
+        authState = "offline";
       } finally {
         if (timer) clearTimeout(timer);
       }
-    }
-    return { state, online };
+    return { state, online, auth: authState };
   }
   const isOnline = () => online;
 
@@ -106,7 +129,7 @@ const Store = (() => {
       await fetch(CONFIG.GOOGLE_SCRIPT_URL, {
         method: "POST", mode: "no-cors",
         headers: { "Content-Type": "text/plain" },
-        body: JSON.stringify({ action, sheet, row }),
+        body: JSON.stringify({ action, sheet, row, token: apiToken }),
       });
     } catch (e) { console.warn("push failed", e); }
   }
@@ -202,5 +225,5 @@ const Store = (() => {
     saveLocal();
   }
 
-  return { get, init, isOnline, addTx, updateTx, deleteTx, addTrip, upsertGoal, deleteGoal, upsertDeposit, deleteDeposit, topupDeposit, seedDemo, clearAll };
+  return { get, init, isOnline, getAuthState, setToken, hasToken, addTx, updateTx, deleteTx, addTrip, upsertGoal, deleteGoal, upsertDeposit, deleteDeposit, topupDeposit, seedDemo, clearAll };
 })();

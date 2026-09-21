@@ -264,6 +264,21 @@
   </div>
 </div>
 
+<!-- Modal: код доступа к таблице -->
+<div id="modalToken" class="modal hidden">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-head"><h2>Код доступа</h2><button class="icon-btn" data-close="modalToken"><svg class="ic ic-sm" aria-hidden="true"><use href="#i-x"/></svg></button></div>
+    <p class="muted small">Таблица защищена кодовым словом. Введите его один раз — сохранится в этом браузере и больше не спросится.</p>
+    <div id="tokenError" class="hint hint-error hidden">Неверное слово. Проверьте и попробуйте ещё раз.</div>
+    <form id="tokenForm">
+      <label>Кодовое слово<input type="password" id="tokenInput" class="input" autocomplete="off" placeholder="Вставьте код"></label>
+      <button type="submit" class="btn btn-primary btn-block">Подключить</button>
+      <button type="button" id="tokenSkip" class="btn btn-ghost btn-block">Продолжить без синхронизации</button>
+    </form>
+  </div>
+</div>
+
 <div id="toast" class="toast hidden"></div>
 
 <script src="js/config.js"></script>

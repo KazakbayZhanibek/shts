@@ -76,7 +76,34 @@
       syncEl.textContent = "● синхронизация…";
       syncEl.className = "sync";
     }
-    Store.init().then(() => UI.refreshAll()); // сверка с таблицей фоном
+    Store.init().then(({ auth }) => {
+      UI.refreshAll(); // сверка с таблицей фоном
+      if (auth === "forbidden" && !sessionStorage.getItem("tt_token_dismissed")) {
+        UI.openTokenModal(Store.hasToken()); // был код и он неверный -> показать ошибку
+      } else if (auth === "unconfigured") {
+        UI.toast("На сервере не задан APP_TOKEN");
+      }
+    });
+
+    // Код доступа к таблице
+    $("tokenForm").onsubmit = (e) => {
+      e.preventDefault();
+      const v = $("tokenInput").value.trim();
+      if (!v) return;
+      Store.setToken(v);
+      sessionStorage.removeItem("tt_token_dismissed");
+      closeModal("modalToken");
+      if (syncEl) { syncEl.textContent = "● синхронизация…"; syncEl.className = "sync"; }
+      Store.init().then(({ auth }) => {
+        UI.refreshAll();
+        if (auth === "forbidden") UI.openTokenModal(true);
+        else if (auth === "ok") UI.toast("Синхронизация включена ✓");
+      });
+    };
+    $("tokenSkip").onclick = () => {
+      sessionStorage.setItem("tt_token_dismissed", "1");
+      closeModal("modalToken");
+    };
 
     // навигация
     document.querySelectorAll("[data-goto]").forEach((b) => (b.onclick = () => goto(b.dataset.goto)));

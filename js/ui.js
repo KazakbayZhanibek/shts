@@ -169,15 +169,29 @@ const UI = (() => {
     }).join("") : `<div class="empty">Депозитов пока нет</div>`;
   }
 
+  function openTokenModal(showError = false) {
+    $("tokenError").classList.toggle("hidden", !showError);
+    if (!showError) $("tokenInput").value = Store.hasToken() ? "" : $("tokenInput").value;
+    $("modalToken").classList.remove("hidden");
+    setTimeout(() => $("tokenInput").focus(), 100);
+  }
+
   function refreshAll() {
     renderHome(); renderHistory(); renderAnalytics(); renderGoals();
-    const online = Store.isOnline();
     const el = document.getElementById("syncStatus");
     if (el) {
-      el.textContent = online ? "● sheets ✓" : (CONFIG.GOOGLE_SCRIPT_URL ? "● офлайн" : "● локально");
-      el.className = "sync " + (online ? "sync-online" : "sync-local");
+      const auth = Store.getAuthState ? Store.getAuthState() : "local";
+      let text = "● локально", cls = "sync sync-local";
+      if (CONFIG.GOOGLE_SCRIPT_URL) {
+        if (Store.isOnline() && auth === "ok") { text = "● sheets ✓"; cls = "sync sync-online"; }
+        else if (auth === "forbidden") text = "● нужен код";
+        else if (auth === "unconfigured") text = "● нет ключа на сервере";
+        else text = "● офлайн";
+      }
+      el.textContent = text;
+      el.className = cls;
     }
   }
 
-  return { toast, txRow, renderHome, renderHistory, renderAnalytics, renderGoals, refreshAll, filters, getFilters, setAnalyticsMode: (m) => (analyticsMode = m), getAnalyticsMode: () => analyticsMode };
+  return { toast, txRow, renderHome, renderHistory, renderAnalytics, renderGoals, refreshAll, openTokenModal, filters, getFilters, setAnalyticsMode: (m) => (analyticsMode = m), getAnalyticsMode: () => analyticsMode };
 })();
